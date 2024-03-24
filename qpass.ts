@@ -1,24 +1,27 @@
 #!/usr/bin/env -S deno run --quiet --allow-read
 /**
  * @file qpass.ts
- * @brief Provide a choice of passwords based on three letter words and different marks.
+ * @brief Provide a choice of passwords based on combinations of three letter words and different marks.
  *
- * @author     simon rowe <simon@wiremoons.com>
- * @license    open-source released under "MIT Licence"
+ * @author     Simon Rowe <simon@wiremoons.com>
+ * @license    open-source released under "MIT License"
  * @source     https://github.com/wiremoons/qpass
  *
  * @date originally created: 30 July 2023
- * @date updated significantly:
+ * @date updated significantly: 24 March 2024
  *
- * @details Provide a choice of passwords based on three letter words and different marks.
+ * @details Provide a choice of passwords based on combinations of three letter words and different marks.
  * Application is written in TypeScript for use with the Deno runtime: https://deno.land/
  *
- * @note The program can be run with Deno using the command:
- * @code deno run --quiet --allow-read
+ * @note The program can be run with Deno using the commands below - either using a locally copy, or directly via the applications Github URL:
+ * @code deno run --quiet --allow-read qpass.ts
+ * @code deno run --quiet --allow-read https://github.com/wiremoons/qpass/qpass.ts
  * @note The program can be installed to 'DENO_INSTALL_ROOT' to using the command:
  * @code deno install -f --quiet --allow-read qpass.ts
+ * @code deno install -f --quiet --allow-read https://github.com/wiremoons/qpass/qpass.ts
  * @note The program can be compiled using the command:
  * @code deno compile --quiet --allow-read qpass.ts
+ * @code deno compile --quiet --allow-read https://github.com/wiremoons/qpass/qpass.ts
  */
 
 //--------------------------------
@@ -26,9 +29,9 @@
 //--------------------------------
 
 // Deno stdlib imports
-import { parse } from "https://deno.land/std@0.195.0/flags/mod.ts";
-import { basename } from "https://deno.land/std@0.195.0/path/mod.ts";
-import { bold } from "https://deno.land/std@0.195.0/fmt/colors.ts";
+import { parseArgs } from "https://deno.land/std@0.220.1/cli/parse_args.ts";
+import { basename } from "https://deno.land/std@0.220.1/path/mod.ts";
+import { bold } from "https://deno.land/std@0.220.1/fmt/colors.ts";
 
 // Other imports
 import { cliVersion } from "https://deno.land/x/deno_mod@0.8.1/mod.ts";
@@ -44,13 +47,13 @@ const versionOptions = {
   version: "0.0.1",
   copyrightName: "Simon Rowe",
   licenseUrl: "https://github.com/wiremoons/qpass/",
-  crYear: "2023",
+  crYear: "2023-2024",
 };
 
 /** Define the command line argument switches and options that can be used */
 const cliOpts = {
-  default: { h: false, v: false },
-  alias: { h: "help", v: "version" },
+  default: { a: false, h: false, v: false },
+  alias: { a: "about", h: "help", v: "version" },
   stopEarly: true,
   //unknown: showUnknown,
 };
@@ -62,7 +65,7 @@ const cliOpts = {
 /** obtain any command line arguments and exec them as needed */
 async function execCliArgs() {
   //console.log(parse(Deno.args,cliOpts));
-  const cliArgs = parse(Deno.args, cliOpts);
+  const cliArgs = parseArgs(Deno.args, cliOpts);
 
   if (cliArgs.help) {
     printHelp();
@@ -71,6 +74,11 @@ async function execCliArgs() {
 
   if (cliArgs.version) {
     await printVersionInfo();
+    Deno.exit(0);
+  }
+
+  if (cliArgs.about) {
+    printAboutInfo();
     Deno.exit(0);
   }
 }
@@ -90,10 +98,10 @@ async function execCliArgs() {
 //--------------------------------
 
 /**
- * Type Guard for DamtInterface interface object
+ * Type Guard for qpass Interface interface object
  */
 //// deno-lint-ignore no-explicit-any
-// function isObject(arg: any): arg is DamtInterface {
+// function isObject(arg: any): arg is QpassInterface {
 //   return arg !== undefined;
 // }
 
@@ -125,15 +133,179 @@ async function printVersionInfo() {
 /** Display application help when requested  */
 function printHelp() {
   console.log(`
-Provide a choice of passwords based on three letter words and different marks.
+${bold("Quick Password")} 'qpass':
+Provide a choice of passwords based on combinations of three letter words and different marks.
 
 Usage: ${bold(getAppName())} [switches] [arguments]
 
 [Switches]       [Arguments]   [Default Value]   [Description]
 -h, --help                          false        display help information
 -v, --version                       false        display program version
+-a, --about                         false        information on password generation
 `);
 }
+
+/** Display information about password generation */
+function printAboutInfo() {
+  console.log(`
+How Passwords Are Generated.
+
+Passwords are generated randomly using a dictionary of three letter long 
+English words. The words are combined with 'marks' that consist of 
+randomly select characters such full stop, colon, dash, etc. The generated 
+password also include a randomly generated number between zero and ninety nine.
+
+To further increase the entropy of the generated password, the words from the 
+dictionary can be capitalised, or randomly include upper and lower case characters.
+
+Currently the passwords are generated using the settings:
+
+- Number of marks: ${marks.length} 
+- Three letter word dictionary size: ${words.length}
+
+- Generated password word length: three (3) words
+- Include random numbers: true
+- Include random marks: true
+- Include title case words: true
+- Include random upper and lower case letters: false
+
+The above settings can be altered via either environment variables, command 
+line flags, or the configurations file.
+  `);
+}
+
+//----------------------------------------------------------------
+// Password Source Data Start
+//----------------------------------------------------------------
+// Each character (mark) is used as an additional random value to enhance
+// the strength of the generated password.
+// deno-fmt-ignore
+const marks: Array<string> = ['#', '.', ';', '@', '%', ':', '!', '>', '-', '<'];
+
+// Each string in the array that contains three letter english words used
+// to generate a password string.
+// deno-fmt-ignore
+const words:Array<string> = [
+    "aah", "aal", "aas", "aba", "abb", "abo", "abs", "aby", "ace", "ach", "act",
+    "add", "ado", "ads", "adz", "aff", "aft", "aga", "age", "ago", "ags", "aha",
+    "ahi", "ahs", "aia", "aid", "ail", "aim", "ain", "air", "ais", "ait", "aka",
+    "ake", "ala", "alb", "ale", "alf", "all", "alp", "als", "alt", "alu", "ama",
+    "ame", "ami", "amp", "amu", "ana", "and", "ane", "ani", "ann", "ans", "ant",
+    "any", "ape", "apo", "app", "apt", "arb", "arc", "ard", "are", "arf", "ark",
+    "arm", "ars", "art", "ary", "ash", "ask", "asp", "ass", "ate", "ats", "att",
+    "aua", "aue", "auf", "auk", "ava", "ave", "avo", "awa", "awe", "awk", "awl",
+    "awn", "axe", "aye", "ays", "ayu", "azo", "baa", "bac", "bad", "bag", "bah",
+    "bal", "bam", "ban", "bap", "bar", "bas", "bat", "bay", "bed", "bee", "beg",
+    "bel", "ben", "bes", "bet", "bey", "bez", "bib", "bid", "big", "bin", "bio",
+    "bis", "bit", "biz", "boa", "bob", "bod", "bog", "boh", "boi", "bok", "bon",
+    "boo", "bop", "bor", "bos", "bot", "bow", "box", "boy", "bra", "bro", "brr",
+    "bru", "bub", "bud", "bug", "bum", "bun", "bur", "bus", "but", "buy", "bye",
+    "bys", "caa", "cab", "cad", "cag", "cam", "can", "cap", "car", "cat", "caw",
+    "cay", "caz", "cee", "cel", "cep", "cha", "che", "chi", "cid", "cig", "cis",
+    "cit", "cly", "cob", "cod", "cog", "col", "con", "coo", "cop", "cor", "cos",
+    "cot", "cow", "cox", "coy", "coz", "cru", "cry", "cub", "cud", "cue", "cum",
+    "cup", "cur", "cut", "cuz", "cwm", "dab", "dad", "dae", "dag", "dah", "dak",
+    "dal", "dam", "dan", "dap", "das", "daw", "day", "deb", "dee", "def", "deg",
+    "dei", "del", "den", "dev", "dew", "dex", "dey", "dib", "did", "die", "dif",
+    "dig", "dim", "din", "dip", "dis", "dit", "div", "dob", "doc", "dod", "doe",
+    "dof", "dog", "doh", "dol", "dom", "don", "doo", "dop", "dor", "dos", "dot",
+    "dow", "doy", "dry", "dso", "dub", "dud", "due", "dug", "duh", "dui", "dun",
+    "duo", "dup", "dux", "dye", "dzo", "ean", "ear", "eas", "eat", "eau", "ebb",
+    "ech", "eco", "ecu", "edh", "eds", "eek", "eel", "een", "eff", "efs", "eft",
+    "egg", "ego", "ehs", "eik", "eke", "eld", "elf", "elk", "ell", "elm", "els",
+    "elt", "eme", "emo", "ems", "emu", "end", "ene", "eng", "ens", "eon", "era",
+    "ere", "erf", "erg", "erk", "erm", "ern", "err", "ers", "ess", "est", "eta",
+    "eth", "euk", "eve", "evo", "ewe", "ewk", "ewt", "exo", "eye", "faa", "fab",
+    "fad", "fae", "fag", "fah", "fan", "fap", "far", "fas", "fat", "faw", "fax",
+    "fay", "fed", "fee", "feg", "feh", "fem", "fen", "fer", "fes", "fet", "feu",
+    "few", "fey", "fez", "fib", "fid", "fie", "fig", "fil", "fin", "fir", "fit",
+    "fix", "fiz", "flu", "fly", "fob", "foe", "fog", "foh", "fon", "fop", "for",
+    "fou", "fox", "foy", "fra", "fro", "fry", "fub", "fud", "fug", "fum", "fun",
+    "fur", "gab", "gad", "gae", "gag", "gak", "gal", "gam", "gan", "gap", "gar",
+    "gas", "gat", "gau", "gaw", "gay", "ged", "gee", "gel", "gem", "gen", "geo",
+    "ger", "get", "gey", "ghi", "gib", "gid", "gie", "gif", "gig", "gin", "gio",
+    "gip", "gis", "git", "gju", "gnu", "goa", "gob", "god", "goe", "gon", "goo",
+    "gor", "gos", "got", "gov", "gox", "goy", "gub", "gue", "gul", "gum", "gun",
+    "gup", "gur", "gus", "gut", "guv", "guy", "gym", "gyp", "had", "hae", "hag",
+    "hah", "haj", "ham", "han", "hao", "hap", "has", "hat", "haw", "hay", "heh",
+    "hem", "hen", "hep", "her", "hes", "het", "hew", "hex", "hey", "hic", "hid",
+    "hie", "him", "hin", "hip", "his", "hit", "hmm", "hoa", "hob", "hoc", "hod",
+    "hoe", "hog", "hoh", "hoi", "hom", "hon", "hoo", "hop", "hos", "hot", "how",
+    "hox", "hoy", "hub", "hue", "hug", "huh", "hui", "hum", "hun", "hup", "hut",
+    "hye", "hyp", "ice", "ich", "ick", "icy", "ide", "ids", "iff", "ifs", "igg",
+    "ilk", "ill", "imp", "ing", "ink", "inn", "ins", "ion", "ios", "ire", "irk",
+    "ish", "ism", "iso", "ita", "its", "ivy", "iwi", "jab", "jag", "jai", "jak",
+    "jam", "jap", "jar", "jaw", "jay", "jee", "jet", "jeu", "jew", "jib", "jig",
+    "jin", "jiz", "job", "joe", "jog", "jol", "jor", "jot", "jow", "joy", "jud",
+    "jug", "jun", "jus", "jut", "kab", "kae", "kaf", "kai", "kak", "kam", "kas",
+    "kat", "kaw", "kay", "kea", "keb", "ked", "kef", "keg", "ken", "kep", "ket",
+    "kex", "key", "khi", "kid", "kif", "kin", "kip", "kir", "kis", "kit", "koa",
+    "kob", "koi", "kon", "kop", "kor", "kos", "kow", "kue", "kye", "kyu", "lab",
+    "lac", "lad", "lag", "lah", "lam", "lap", "lar", "las", "lat", "lav", "law",
+    "lax", "lay", "lea", "led", "lee", "leg", "lei", "lek", "lep", "les", "let",
+    "leu", "lev", "lew", "lex", "ley", "lez", "lib", "lid", "lie", "lig", "lin",
+    "lip", "lis", "lit", "lob", "lod", "log", "loo", "lop", "lor", "los", "lot",
+    "lou", "low", "lox", "loy", "lud", "lug", "lum", "lur", "luv", "lux", "luz",
+    "lye", "lym", "maa", "mac", "mad", "mae", "mag", "mak", "mal", "mam", "man",
+    "map", "mar", "mas", "mat", "maw", "max", "may", "med", "mee", "meg", "meh",
+    "mel", "mem", "men", "mes", "met", "meu", "mew", "mho", "mib", "mic", "mid",
+    "mig", "mil", "mim", "mir", "mis", "mix", "miz", "mna", "moa", "mob", "moc",
+    "mod", "moe", "mog", "moi", "mol", "mom", "mon", "wit", "moo", "mop", "mor",
+    "mos", "mot", "mou", "mow", "moy", "moz", "mud", "mug", "mum", "mun", "mus",
+    "mut", "mux", "myc", "nab", "nae", "nag", "nah", "nam", "nan", "nap", "nas",
+    "nat", "naw", "nay", "neb", "ned", "nee", "nef", "neg", "nek", "nep", "net",
+    "new", "nib", "nid", "nie", "nil", "nim", "nip", "nis", "nit", "nix", "nob",
+    "nod", "nog", "noh", "nom", "non", "noo", "nor", "nos", "not", "now", "nox",
+    "noy", "nth", "nub", "nun", "nur", "nus", "nut", "nye", "nys", "oaf", "oak",
+    "oar", "oat", "oba", "obe", "obi", "obo", "obs", "oca", "och", "oda", "odd",
+    "ode", "ods", "oes", "off", "oft", "ohm", "oho", "ohs", "oik", "oil", "ois",
+    "oka", "oke", "old", "ole", "olm", "oms", "one", "ono", "ons", "ony", "oof",
+    "ooh", "oom", "oon", "oop", "oor", "oos", "oot", "ope", "ops", "opt", "ora",
+    "orb", "orc", "ord", "ore", "orf", "ors", "ort", "ose", "oud", "ouk", "oup",
+    "our", "ous", "out", "ova", "owe", "owl", "own", "owt", "oxo", "oxy", "oye",
+    "oys", "pac", "pad", "pah", "pal", "pam", "pan", "pap", "par", "pas", "pat",
+    "pav", "paw", "pax", "pay", "pea", "pec", "ped", "pee", "peg", "peh", "pel",
+    "pen", "pep", "per", "pes", "pet", "pew", "phi", "pho", "pht", "pia", "pic",
+    "pie", "pig", "pin", "pip", "pir", "pis", "pit", "piu", "pix", "plu", "ply",
+    "poa", "pod", "poh", "poi", "pol", "pom", "poo", "pop", "pos", "pot", "pow",
+    "pox", "poz", "pre", "pro", "pry", "psi", "pst", "pub", "pud", "pug", "puh",
+    "pul", "pun", "pup", "pur", "pus", "put", "puy", "pya", "pye", "pyx", "qat",
+    "qis", "qua", "qin", "rad", "rag", "rah", "rai", "raj", "ram", "ran", "rap",
+    "ras", "rat", "rav", "raw", "rax", "ray", "reb", "rec", "red", "ree", "ref",
+    "reg", "reh", "rei", "rem", "ren", "reo", "rep", "res", "ret", "rev", "rew",
+    "rex", "rez", "rho", "rhy", "ria", "rib", "rid", "rif", "rig", "rim", "rin",
+    "rip", "rit", "riz", "rob", "roc", "rod", "roe", "rok", "rom", "roo", "rot",
+    "row", "rub", "ruc", "rud", "rue", "rug", "rum", "run", "rut", "rya", "rye",
+    "sab", "sac", "sad", "sae", "sag", "sai", "sal", "sam", "san", "sap", "sar",
+    "sat", "sau", "sav", "saw", "sax", "say", "SAY", "saz", "sea", "sec", "sed",
+    "see", "seg", "sei", "sel", "sen", "ser", "set", "sew", "sex", "sey", "sez",
+    "sha", "she", "shh", "shy", "sib", "sic", "sif", "sik", "sim", "sin", "sip",
+    "sir", "sis", "sit", "six", "ska", "ski", "sky", "sly", "sma", "sny", "sob",
+    "soc", "sod", "sog", "soh", "sol", "som", "son", "sop", "sos", "sot", "sou",
+    "sov", "sow", "sox", "soy", "soz", "spa", "spy", "sri", "sty", "sub", "sud",
+    "sue", "sug", "sui", "suk", "sum", "sun", "sup", "suq", "sur", "sus", "swy",
+    "sye", "syn", "tab", "tad", "tae", "tag", "tai", "taj", "tak", "tam", "tan",
+    "tao", "tap", "tar", "tas", "tat", "tau", "tav", "taw", "tax", "tay", "tea",
+    "tec", "ted", "tee", "tef", "teg", "tel", "ten", "tes", "tet", "tew", "tex",
+    "the", "tho", "thy", "tic", "tid", "tie", "tig", "tik", "til", "tin", "tip",
+    "tis", "tit", "tix", "toc", "tod", "toe", "tog", "tom", "ton", "too", "top",
+    "tor", "tot", "tow", "toy", "try", "tsk", "tub", "tug", "tui", "tum", "tun",
+    "tup", "tut", "tux", "twa", "two", "twp", "tye", "tyg", "udo", "uds", "uey",
+    "ufo", "ugh", "ugs", "uke", "ule", "ulu", "umm", "ump", "ums", "umu", "uni",
+    "uns", "upo", "ups", "urb", "urd", "ure", "urn", "urp", "use", "uta", "ute",
+    "uts", "utu", "uva", "vac", "vae", "vag", "van", "var", "vas", "vat", "vau",
+    "vav", "vaw", "vee", "veg", "vet", "vex", "via", "vid", "vie", "vig", "vim",
+    "vin", "vis", "vly", "voe", "vol", "vor", "vow", "vox", "vug", "vum", "wab",
+    "wad", "wae", "wag", "wai", "wan", "wap", "war", "was", "wat", "waw", "wax",
+    "way", "web", "wed", "wee", "wem", "wen", "wet", "wex", "wey", "wha", "who",
+    "why", "wig", "win", "wis", "wit", "wiz", "woe", "wof", "wog", "wok", "won",
+    "woo", "wop", "wos", "wot", "wow", "wox", "wry", "wud", "wus", "wye", "wyn",
+    "xis", "yad", "yae", "yag", "yah", "yak", "yam", "yap", "yar", "yaw", "yay",
+    "yea", "yeh", "yen", "yep", "yes", "yet", "yew", "yex", "ygo", "yid", "yin",
+    "yip", "yob", "yod", "yok", "yom", "yon", "you", "yow", "yug", "yuk", "yum",
+    "yup", "yus", "zag", "zap", "zas", "zax", "zea", "zed", "zee", "zek", "zel",
+    "zep", "zex", "zho", "zig", "zin", "zip", "zit", "ziz", "zoa", "zol", "zoo",
+    "zos", "zuz", "zzz"];
 
 //----------------------------------------------------------------
 // MAIN : Deno script execution start
@@ -142,7 +314,4 @@ Usage: ${bold(getAppName())} [switches] [arguments]
 if (import.meta.main) {
   // only returns if execCliArgs() did not find options to execute
   if (Deno.args.length > 0) await execCliArgs();
-
-  await printVersionInfo();
-  printHelp();
 }

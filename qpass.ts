@@ -1,4 +1,4 @@
-#!/usr/bin/env -S deno run --quiet --allow-read
+#!/usr/bin/env -S deno run --quiet --allow-read --allow-env=QPASS_WORDS
 /**
  * @file qpass.ts
  * @brief Provide a choice of passwords based on combinations of three letter words and different marks.
@@ -14,14 +14,14 @@
  * Application is written in TypeScript for use with the Deno runtime: https://deno.land/
  *
  * @note The program can be run with Deno using the commands below - either using a locally copy, or directly via the applications Github URL:
- * @code deno run --quiet --allow-read qpass.ts
- * @code deno run --quiet --allow-read https://github.com/wiremoons/qpass/qpass.ts
+ * @code deno run --quiet --allow-read --allow-env=QPASS_WORDS qpass.ts
+ * @code deno run --quiet --allow-read --allow-env=QPASS_WORDS https://github.com/wiremoons/qpass/qpass.ts
  * @note The program can be installed to 'DENO_INSTALL_ROOT' to using the command:
- * @code deno install -f --quiet --allow-read qpass.ts
- * @code deno install -f --quiet --allow-read https://github.com/wiremoons/qpass/qpass.ts
+ * @code deno install -f --quiet --allow-read --allow-env=QPASS_WORDS qpass.ts
+ * @code deno install -f --quiet --allow-read --allow-env=QPASS_WORDS https://github.com/wiremoons/qpass/qpass.ts
  * @note The program can be compiled using the command:
- * @code deno compile --quiet --allow-read qpass.ts
- * @code deno compile --quiet --allow-read https://github.com/wiremoons/qpass/qpass.ts
+ * @code deno compile --quiet --allow-read --allow-env=QPASS_WORDS qpass.ts
+ * @code deno compile --quiet --allow-read --allow-env=QPASS_WORDS https://github.com/wiremoons/qpass/qpass.ts
  */
 
 //--------------------------------
@@ -44,7 +44,7 @@ import { cliVersion } from "https://deno.land/x/deno_mod@0.8.1/mod.ts";
 
 /** define options for `cliVersion()` function for application version data */
 const versionOptions = {
-  version: "0.0.1",
+  version: "0.0.2",
   copyrightName: "Simon Rowe",
   licenseUrl: "https://github.com/wiremoons/qpass/",
   crYear: "2023-2024",
@@ -114,11 +114,11 @@ function getAppName(): string {
   return `${basename(Deno.mainModule) ?? "UNKNOWN"}`;
 }
 
-// /** Check environment variable 'ACRODB' for a valid filename */
-// async function getDBEnv(): Promise<string | undefined> {
-//   const dbFile = Deno.env.get("ACRODB") || "";
-//   return await existsFile(dbFile) ? dbFile : undefined;
-// }
+// /** Check environment variable 'QPASS_WORDS' for numbers of password words to include */
+function QpassWordsEnv(): number {
+  const qpass_words = parseInt(Deno.env.get("QPASS_WORDS") || "");
+  return Number.isInteger(qpass_words) ? qpass_words : 3;
+}
 
 //--------------------------------
 // DISPLAY INFO FUNCTIONS
@@ -142,11 +142,16 @@ Usage: ${bold(getAppName())} [switches] [arguments]
 -h, --help                          false        display help information
 -v, --version                       false        display program version
 -a, --about                         false        information on password generation
+
+Other environment controlled settings or configurations file parameters can be defined. 
+See 'How Passwords Are Generated.' information using the '-a' or --about' command 
+line flags for more detailed help and explanations. 
 `);
 }
 
 /** Display information about password generation */
 function printAboutInfo() {
+  const qpass_words: number = QpassWordsEnv();
   console.log(`
 How Passwords Are Generated.
 
@@ -163,7 +168,9 @@ Currently the passwords are generated using the settings:
 - Number of marks: ${marks.length} 
 - Three letter word dictionary size: ${words.length}
 
-- Generated password word length: three (3) words
+- Generated password number of words included: ${qpass_words} ${
+    qpass_words === 3 ? "[default]" : "[user defined]"
+  }
 - Include random numbers: true
 - Include random marks: true
 - Include title case words: true
@@ -171,6 +178,9 @@ Currently the passwords are generated using the settings:
 
 The above settings can be altered via either environment variables, command 
 line flags, or the configurations file.
+
+Optional environment variable settings:
+QPASS_WORDS=3  :  defines the number of random three letter words to include [default: 3]
   `);
 }
 
@@ -312,6 +322,9 @@ const words:Array<string> = [
 //----------------------------------------------------------------
 
 if (import.meta.main) {
+  // ensure a value exists for number of random words to include.
+  const qpass_words: number = QpassWordsEnv();
   // only returns if execCliArgs() did not find options to execute
   if (Deno.args.length > 0) await execCliArgs();
+  // default execute action if no cli args given - offer a password
 }

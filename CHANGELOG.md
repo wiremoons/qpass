@@ -1,3 +1,9 @@
+## v0.0.3
+
+- Add function to select a random three letter word.
+- Add function to select a random mark.
+- Add function to provide a random number.
+
 ## v0.0.2
 
 - Add option for obtaining `QPASS_WORDS` from optional user's environment

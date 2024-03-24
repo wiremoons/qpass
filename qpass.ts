@@ -44,7 +44,7 @@ import { cliVersion } from "https://deno.land/x/deno_mod@0.8.1/mod.ts";
 
 /** define options for `cliVersion()` function for application version data */
 const versionOptions = {
-  version: "0.0.2",
+  version: "0.0.3",
   copyrightName: "Simon Rowe",
   licenseUrl: "https://github.com/wiremoons/qpass/",
   crYear: "2023-2024",
@@ -114,10 +114,31 @@ function getAppName(): string {
   return `${basename(Deno.mainModule) ?? "UNKNOWN"}`;
 }
 
-// /** Check environment variable 'QPASS_WORDS' for numbers of password words to include */
+/** Check environment variable 'QPASS_WORDS' for numbers of password words to include */
 function QpassWordsEnv(): number {
   const qpass_words = parseInt(Deno.env.get("QPASS_WORDS") || "");
   return Number.isInteger(qpass_words) ? qpass_words : 3;
+}
+
+/** Provide a random word from the dictionary if three letter words array */
+function randomWord(): string {
+  const max: number = words.length - 1;
+  const random_number: number = Math.floor(Math.random() * max);
+  return words.at(random_number) as string;
+}
+
+/** Provide a random mark from the selection included in the marks array  */
+function randomMark(): string {
+  const max: number = marks.length - 1;
+  const random_number: number = Math.floor(Math.random() * max);
+  return marks.at(random_number) as string;
+}
+
+/** Provide a random number between 01 and 99 */
+function randomNumber(): number {
+  const max: number = 100; // Math.random() is not inclusive
+  const random_number: number = Math.floor(Math.random() * max);
+  return random_number;
 }
 
 //--------------------------------
@@ -327,4 +348,8 @@ if (import.meta.main) {
   // only returns if execCliArgs() did not find options to execute
   if (Deno.args.length > 0) await execCliArgs();
   // default execute action if no cli args given - offer a password
+  console.log(
+    randomNumber() + randomMark() + randomWord() + randomWord() + randomWord() +
+      randomMark() + randomNumber(),
+  );
 }

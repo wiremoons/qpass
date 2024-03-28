@@ -13,15 +13,15 @@
  * @details Provide a choice of passwords based on combinations of three letter words and different marks.
  * Application is written in TypeScript for use with the Deno runtime: https://deno.land/
  *
- * @note The program can be run with Deno using the commands below - either using a locally copy, or directly via the applications Github URL:
+ * @note The program can be run with Deno using the commands below - either using a local copy, or directly via the applications Github URL:
  * @code deno run --quiet --allow-read --allow-env=QPASS_WORDS qpass.ts
- * @code deno run --quiet --allow-read --allow-env=QPASS_WORDS https://github.com/wiremoons/qpass/qpass.ts
+ * @code deno run --quiet --allow-read --allow-env=QPASS_WORDS https://raw.githubusercontent.com/wiremoons/qpass/main/qpass.ts
  * @note The program can be installed to 'DENO_INSTALL_ROOT' to using the command:
  * @code deno install -f --quiet --allow-read --allow-env=QPASS_WORDS qpass.ts
- * @code deno install -f --quiet --allow-read --allow-env=QPASS_WORDS https://github.com/wiremoons/qpass/qpass.ts
+ * @code deno install -f --quiet --allow-read --allow-env=QPASS_WORDS https://raw.githubusercontent.com/wiremoons/qpass/main/qpass.ts
  * @note The program can be compiled using the command:
  * @code deno compile --quiet --allow-read --allow-env=QPASS_WORDS qpass.ts
- * @code deno compile --quiet --allow-read --allow-env=QPASS_WORDS https://github.com/wiremoons/qpass/qpass.ts
+ * @code deno compile --quiet --allow-read --allow-env=QPASS_WORDS https://raw.githubusercontent.com/wiremoons/qpass/main/qpass.ts
  */
 
 //--------------------------------
@@ -29,9 +29,9 @@
 //--------------------------------
 
 // Deno stdlib imports
-import { parseArgs } from "https://deno.land/std@0.220.1/cli/parse_args.ts";
-import { basename } from "https://deno.land/std@0.220.1/path/mod.ts";
-import { bold } from "https://deno.land/std@0.220.1/fmt/colors.ts";
+import { parseArgs } from "jsr:@std/cli@0.220.1/parse_args";
+import { basename } from "jsr:@std/path@0.220.1";
+import { bold } from "jsr:@std/fmt@0.220.1/colors";
 
 // Other imports
 import { cliVersion } from "https://deno.land/x/deno_mod@0.8.1/mod.ts";
@@ -44,7 +44,7 @@ import { cliVersion } from "https://deno.land/x/deno_mod@0.8.1/mod.ts";
 
 /** define options for `cliVersion()` function for application version data */
 const versionOptions = {
-  version: "0.0.3",
+  version: "0.1.0",
   copyrightName: "Simon Rowe",
   licenseUrl: "https://github.com/wiremoons/qpass/",
   crYear: "2023-2024",
@@ -141,6 +141,18 @@ function randomNumber(): number {
   return random_number;
 }
 
+/** Alter a string to randomly changed characters of either upper of lower case */
+function randomCaseString(input: string): string {
+  if (input.length < 1) return input;
+  return input;
+}
+
+/** Capitalise the first character of a string */
+function toTitleCaseFirstLetter(input: string): string {
+  if (input.length === 0) return input;
+  return input = input.charAt(0).toUpperCase() + input.substring(1);
+}
+
 //--------------------------------
 // DISPLAY INFO FUNCTIONS
 //--------------------------------
@@ -186,23 +198,51 @@ dictionary can be capitalised, or randomly include upper and lower case characte
 
 Currently the passwords are generated using the settings:
 
-- Number of marks: ${marks.length} 
-- Three letter word dictionary size: ${words.length}
-
+- Number of marks:                             ${marks.length}
+- Three letter word dictionary size:           ${words.length.toLocaleString()}
 - Generated password number of words included: ${qpass_words} ${
     qpass_words === 3 ? "[default]" : "[user defined]"
   }
-- Include random numbers: true
-- Include random marks: true
-- Include title case words: true
+- Include random numbers:                      true
+- Include random marks:                        true
+- Include title case words:                    true
 - Include random upper and lower case letters: false
 
 The above settings can be altered via either environment variables, command 
 line flags, or the configurations file.
 
 Optional environment variable settings:
-QPASS_WORDS=3  :  defines the number of random three letter words to include [default: 3]
+- Defines the number of random three letter words to include [default: 3] : QPASS_WORDS=3
   `);
+}
+
+function displayPasswords() {
+  // ensure a value exists for number of random words to include.
+  const qpass_words: number = QpassWordsEnv();
+  let lower_case_words: string = "";
+  let title_case_words: string = "";
+  let random_case_words: string = "";
+  // create passwords requested
+  for (let i: number = 0; i < qpass_words; i++) {
+    const next_word: string = randomWord();
+    lower_case_words = lower_case_words + next_word;
+    title_case_words = title_case_words + toTitleCaseFirstLetter(next_word);
+    random_case_words = random_case_words + randomCaseString(next_word);
+  }
+  // create two random numbers
+  const random_number_one = randomNumber();
+  const random_number_two = randomNumber();
+  // create two random numbers
+  const random_mark_one = randomMark();
+  const random_mark_two = randomMark();
+  console.log("Suggested passwords are:\n");
+  console.log(
+    random_number_one + random_mark_one + lower_case_words + random_mark_two +
+      random_number_two + "   " + title_case_words + random_mark_one +
+      random_number_one + random_number_two + "   " +
+      random_mark_one + random_number_one + random_case_words +
+      random_mark_two + random_number_two,
+  );
 }
 
 //----------------------------------------------------------------
@@ -343,13 +383,8 @@ const words:Array<string> = [
 //----------------------------------------------------------------
 
 if (import.meta.main) {
-  // ensure a value exists for number of random words to include.
-  const qpass_words: number = QpassWordsEnv();
   // only returns if execCliArgs() did not find options to execute
   if (Deno.args.length > 0) await execCliArgs();
   // default execute action if no cli args given - offer a password
-  console.log(
-    randomNumber() + randomMark() + randomWord() + randomWord() + randomWord() +
-      randomMark() + randomNumber(),
-  );
+  displayPasswords();
 }

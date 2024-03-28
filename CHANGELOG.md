@@ -1,3 +1,11 @@
+## v0.1.0
+
+- Switch to '**jsr**' for Deno `stdlib` modules.
+- Correct the URL to use `deno run...`, `deno compile...`, or `deno install...`
+  commands from GitHub repos directly.
+- Add functionality to display random passwords in three different formats.
+- Improve the information in the `README.md` file.
+
 ## v0.0.3
 
 - Add function to select a random three letter word.

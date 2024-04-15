@@ -44,7 +44,7 @@ import { cliVersion } from "https://deno.land/x/deno_mod@0.8.1/mod.ts";
 
 /** define options for `cliVersion()` function for application version data */
 const versionOptions = {
-  version: "0.1.0",
+  version: "0.1.1",
   copyrightName: "Simon Rowe",
   licenseUrl: "https://github.com/wiremoons/qpass/",
   crYear: "2023-2024",
@@ -235,11 +235,10 @@ function displayPasswords() {
   // create two random numbers
   const random_mark_one = randomMark();
   const random_mark_two = randomMark();
-  console.log("Suggested passwords are:\n");
   console.log(
     random_number_one + random_mark_one + lower_case_words + random_mark_two +
-      random_number_two + "   " + title_case_words + random_mark_one +
-      random_number_one + random_number_two + "   " +
+      random_number_two + "\t\t" + title_case_words + random_mark_one +
+      random_number_one + random_number_two + "\t\t" +
       random_mark_one + random_number_one + random_case_words +
       random_mark_two + random_number_two,
   );
@@ -386,5 +385,8 @@ if (import.meta.main) {
   // only returns if execCliArgs() did not find options to execute
   if (Deno.args.length > 0) await execCliArgs();
   // default execute action if no cli args given - offer a password
-  displayPasswords();
+  console.log("\n'qpass' suggested passwords are:\n");
+  for (let i: number = 0; i < 3; i++) {
+    displayPasswords();
+  }
 }

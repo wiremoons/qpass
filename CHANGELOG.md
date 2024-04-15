@@ -1,3 +1,7 @@
+## v0.1.1
+
+- Improve alignment of output suggested passwords.
+
 ## v0.1.0
 
 - Switch to '**jsr**' for Deno `stdlib` modules.

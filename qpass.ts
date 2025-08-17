@@ -9,6 +9,7 @@
  *
  * @date originally created: 30 July 2023
  * @date updated significantly: 24 March 2024
+ * @date updated: 17 August 2025
  *
  * @details Provide a choice of passwords based on combinations of three letter words and different marks.
  * Application is written in TypeScript for use with the Deno runtime: https://deno.land/
@@ -29,8 +30,8 @@
 //--------------------------------
 
 // Deno stdlib imports
-import { parseArgs } from "jsr:@std/cli@0.220.1/parse_args";
-import { basename } from "jsr:@std/path@0.220.1";
+import { parseArgs } from "jsr:@std/cli@1.0.21/parse-args";
+import { basename } from "jsr:@std/path@1.1.2/basename";
 import { bold } from "jsr:@std/fmt@0.220.1/colors";
 
 // Other imports
@@ -44,10 +45,10 @@ import { cliVersion } from "https://deno.land/x/deno_mod@0.8.1/mod.ts";
 
 /** define options for `cliVersion()` function for application version data */
 const versionOptions = {
-  version: "0.1.1",
+  version: "0.1.2",
   copyrightName: "Simon Rowe",
   licenseUrl: "https://github.com/wiremoons/qpass/",
-  crYear: "2023-2024",
+  crYear: "2023-2025",
 };
 
 /** Define the command line argument switches and options that can be used */
@@ -176,9 +177,9 @@ Usage: ${bold(getAppName())} [switches] [arguments]
 -v, --version                       false        display program version
 -a, --about                         false        information on password generation
 
-Other environment controlled settings or configurations file parameters can be defined. 
-See 'How Passwords Are Generated.' information using the '-a' or --about' command 
-line flags for more detailed help and explanations. 
+Other environment controlled settings or configurations file parameters can be defined.
+See 'How Passwords Are Generated.' information using the '-a' or --about' command
+line flags for more detailed help and explanations.
 `);
 }
 
@@ -188,12 +189,12 @@ function printAboutInfo() {
   console.log(`
 How Passwords Are Generated.
 
-Passwords are generated randomly using a dictionary of three letter long 
-English words. The words are combined with 'marks' that consist of 
-randomly select characters such full stop, colon, dash, etc. The generated 
+Passwords are generated randomly using a dictionary of three letter long
+English words. The words are combined with 'marks' that consist of
+randomly select characters such full stop, colon, dash, etc. The generated
 password also include a randomly generated number between zero and ninety nine.
 
-To further increase the entropy of the generated password, the words from the 
+To further increase the entropy of the generated password, the words from the
 dictionary can be capitalised, or randomly include upper and lower case characters.
 
 Currently the passwords are generated using the settings:
@@ -208,7 +209,7 @@ Currently the passwords are generated using the settings:
 - Include title case words:                    true
 - Include random upper and lower case letters: false
 
-The above settings can be altered via either environment variables, command 
+The above settings can be altered via either environment variables, command
 line flags, or the configurations file.
 
 Optional environment variable settings:

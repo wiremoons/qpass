@@ -1,3 +1,8 @@
+## v0.1.2
+
+- Update stdlib versions to latest on `jsr:@std`.
+- Update copyright year range to include 2025.
+
 ## v0.1.1
 
 - Improve alignment of output suggested passwords.

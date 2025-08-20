@@ -1,10 +1,24 @@
 ## About
 
-_Quick Password_ `qpass` : Provide a choice of passwords based on combination
-three letter words and different marks.
+_Quick Password_ `qpass` : Provide a choice of passwords based on a random
+combination of three letter words.
 
-Command line applications written in _Typescript_ using the
+A cross-platform command line applications written in _Typescript_ using the
 [Deno](https://deno.land/) runtime.
+
+Each uniquely generated password uses:
+
+- A user defined number of three-letter words, randomly selected for the
+  dictionary containing 1,312.
+- Two digit random numbers.
+- Marks that are additional characters such as: '#', '.', ';', '@', '%', ':',
+  '!', '>', '-', '<'.
+
+The above settings can be altered via either environment variables, command line
+flags, or the configurations file.
+
+The output can include colour for the random number and marks, to enhance the
+display and readability of the generated password.
 
 ## Installation
 
@@ -24,7 +38,7 @@ deno install -f --quiet --allow-read --allow-env=QPASS_WORDS https://raw.githubu
 ```
 
 Alternatively a copy of `qpass` can be compiled together with the _Deno_ binary
-to create a self contained _compiled_ standalone executable as the `qpass`
+to create a self-contained _compiled_ standalone executable as the `qpass`
 program:
 
 ```console
@@ -37,7 +51,8 @@ Once the above installation has been completed, the program can be run with the
 command: `qpass`. Additional help on the options available when executed can be
 found with the command line flags:
 
-- `-h` : show the command line flag help
+- `-h` : show the command line flag help.
+- `-m` : disable colour output.
 - `-a` : shows the additional help information.
 
 ## Updates and Changes
@@ -45,8 +60,8 @@ found with the command line flags:
 Updates made to the program as it is developed are captured in the
 [CHANGELOG.md](./CHANGELOG.md) project file.
 
-To install an updated version, follow the install steps above that will replace
-the current installed version with any newer version available.
+To install an updated version, follow the installation steps above, that will
+replace the current installed version with any newer version available.
 
 ## License
 

@@ -9,12 +9,12 @@
  *
  * @date originally created: 30 July 2023
  * @date updated significantly: 24 March 2024
- * @date updated: 17 August 2025
+ * @date updated with colour outputs: 20 August 2025
  *
  * @details Provide a choice of passwords based on combinations of three letter words and different marks.
  * Application is written in TypeScript for use with the Deno runtime: https://deno.land/
  *
- * @note The program can be run with Deno using the commands below - either using a local copy, or directly via the applications Github URL:
+ * @note The program can be run with Deno using the commands below - either using a local copy, or directly via the applications GitHub URL:
  * @code deno run --quiet --allow-read --allow-env=QPASS_WORDS qpass.ts
  * @code deno run --quiet --allow-read --allow-env=QPASS_WORDS https://raw.githubusercontent.com/wiremoons/qpass/main/qpass.ts
  * @note The program can be installed to 'DENO_INSTALL_ROOT' to using the command:
@@ -30,9 +30,9 @@
 //--------------------------------
 
 // Deno stdlib imports
-import { parseArgs } from "jsr:@std/cli@1.0.21/parse-args";
-import { basename } from "jsr:@std/path@1.1.2/basename";
-import { bold } from "jsr:@std/fmt@0.220.1/colors";
+import { parseArgs } from "jsr:@std/cli@1.x/parse-args";
+import { basename } from "jsr:@std/path@1.x/basename";
+import { bold, cyan, green, setColorEnabled } from "jsr:@std/fmt@1.x/colors";
 
 // Other imports
 import { cliVersion } from "https://deno.land/x/deno_mod@0.8.1/mod.ts";
@@ -45,7 +45,7 @@ import { cliVersion } from "https://deno.land/x/deno_mod@0.8.1/mod.ts";
 
 /** define options for `cliVersion()` function for application version data */
 const versionOptions = {
-  version: "0.1.2",
+  version: "0.2.0",
   copyrightName: "Simon Rowe",
   licenseUrl: "https://github.com/wiremoons/qpass/",
   crYear: "2023-2025",
@@ -53,8 +53,8 @@ const versionOptions = {
 
 /** Define the command line argument switches and options that can be used */
 const cliOpts = {
-  default: { a: false, h: false, v: false },
-  alias: { a: "about", h: "help", v: "version" },
+  default: { a: false, h: false, m: false, v: false },
+  alias: { a: "about", h: "help", m: "monochrome", v: "version" },
   stopEarly: true,
   //unknown: showUnknown,
 };
@@ -82,6 +82,13 @@ async function execCliArgs() {
     printAboutInfo();
     Deno.exit(0);
   }
+
+  if (cliArgs.monochrome) {
+    // from "jsr:@std/fmt@1.x/colors"
+    // used as this not working as runtime change:
+    //  Deno.env.set("NO_COLOR", "1");
+    setColorEnabled(false);
+  }
 }
 
 /** Function defined in `cliOpts` so is run automatically by `parse()` if an unknown
@@ -99,7 +106,7 @@ async function execCliArgs() {
 //--------------------------------
 
 /**
- * Type Guard for qpass Interface interface object
+ * Type Guard for qpass Interface object
  */
 //// deno-lint-ignore no-explicit-any
 // function isObject(arg: any): arg is QpassInterface {
@@ -138,11 +145,11 @@ function randomMark(): string {
 /** Provide a random number between 01 and 99 */
 function randomNumber(): number {
   const max: number = 100; // Math.random() is not inclusive
-  const random_number: number = Math.floor(Math.random() * max);
-  return random_number;
+  return Math.floor(Math.random() * max);
 }
 
 /** Alter a string to randomly changed characters of either upper of lower case */
+// TODO : write randomCaseString code
 function randomCaseString(input: string): string {
   if (input.length < 1) return input;
   return input;
@@ -151,7 +158,7 @@ function randomCaseString(input: string): string {
 /** Capitalise the first character of a string */
 function toTitleCaseFirstLetter(input: string): string {
   if (input.length === 0) return input;
-  return input = input.charAt(0).toUpperCase() + input.substring(1);
+  return input.charAt(0).toUpperCase() + input.substring(1);
 }
 
 //--------------------------------
@@ -174,6 +181,7 @@ Usage: ${bold(getAppName())} [switches] [arguments]
 
 [Switches]       [Arguments]   [Default Value]   [Description]
 -h, --help                          false        display help information
+-m, --monochrome                    false        disable colour outputs
 -v, --version                       false        display program version
 -a, --about                         false        information on password generation
 
@@ -212,8 +220,13 @@ Currently the passwords are generated using the settings:
 The above settings can be altered via either environment variables, command
 line flags, or the configurations file.
 
+By default number and marks are output with colours. The application supports
+the NO_COLOR environmental variable, disabling any coloring output if NO_COLOR
+is set. Also see runtime flags option: '-m'  or '--monochrome'.
+
 Optional environment variable settings:
 - Defines the number of random three letter words to include [default: 3] : QPASS_WORDS=3
+- Disable colour output if required : NO_COLOR=1
   `);
 }
 
@@ -237,11 +250,15 @@ function displayPasswords() {
   const random_mark_one = randomMark();
   const random_mark_two = randomMark();
   console.log(
-    random_number_one + random_mark_one + lower_case_words + random_mark_two +
-      random_number_two + "\t\t" + title_case_words + random_mark_one +
-      random_number_one + random_number_two + "\t\t" +
-      random_mark_one + random_number_one + random_case_words +
-      random_mark_two + random_number_two,
+    green(`${random_number_one}`) + cyan(`${random_mark_one}`) +
+      lower_case_words +
+      cyan(`${random_mark_two}`) +
+      green(`${random_number_two}`) + "\t\t" + title_case_words +
+      cyan(`${random_mark_one}`) +
+      green(`${random_number_one}`) + green(`${random_number_two}`) + "\t\t" +
+      cyan(`${random_mark_one}`) + green(`${random_number_one}`) +
+      random_case_words +
+      cyan(`${random_mark_two}`) + green(`${random_number_two}`),
   );
 }
 

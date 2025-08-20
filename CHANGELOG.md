@@ -1,3 +1,13 @@
+## v0.2.0
+
+- Remove two unneeded variable assignments for returned values.
+- Add additional `README.md` text explanations about the programs benefits.
+- Change JSR stdlib versions to all use `jsr:@std` at version `1.x`.
+- Add `TODO` to implement the code in function `randomCaseString`.
+- Add colour output for numbers and marks - on by default.
+- Add text to `--about` output regarding use of env variable `NO_COLOR`.
+- Add CLI flags options '-m' or '--monochrome' to disable colour output.
+
 ## v0.1.2
 
 - Update stdlib versions to latest on `jsr:@std`.
@@ -17,7 +27,7 @@
 
 ## v0.0.3
 
-- Add function to select a random three letter word.
+- Add function to select a random three-letter word.
 - Add function to select a random mark.
 - Add function to provide a random number.
 

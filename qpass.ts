@@ -45,7 +45,7 @@ import { cliVersion } from "https://deno.land/x/deno_mod@0.8.1/mod.ts";
 
 /** define options for `cliVersion()` function for application version data */
 const versionOptions = {
-  version: "0.2.0",
+  version: "0.3.0",
   copyrightName: "Simon Rowe",
   licenseUrl: "https://github.com/wiremoons/qpass/",
   crYear: "2023-2025",
@@ -128,7 +128,7 @@ function QpassWordsEnv(): number {
   return Number.isInteger(qpass_words) ? qpass_words : 3;
 }
 
-/** Provide a random word from the dictionary if three letter words array */
+/** Provide a random word from the dictionary of three letter words array */
 function randomWord(): string {
   const max: number = words.length - 1;
   const random_number: number = Math.floor(Math.random() * max);
@@ -142,23 +142,33 @@ function randomMark(): string {
   return marks.at(random_number) as string;
 }
 
-/** Provide a random number between 01 and 99 */
+/** Provide a random number between 00 and 99 */
 function randomNumber(): number {
   const max: number = 100; // Math.random() is not inclusive
   return Math.floor(Math.random() * max);
 }
 
 /** Alter a string to randomly changed characters of either upper of lower case */
-// TODO : write randomCaseString code
 function randomCaseString(input: string): string {
   if (input.length < 1) return input;
-  return input;
+  let random_case_string: string = "";
+  for (const letter of input) {
+    random_case_string += (randomNumber() % 2)
+      ? letter.toUpperCase()
+      : letter.toLowerCase();
+  }
+  return random_case_string;
 }
 
 /** Capitalise the first character of a string */
 function toTitleCaseFirstLetter(input: string): string {
   if (input.length === 0) return input;
   return input.charAt(0).toUpperCase() + input.substring(1);
+}
+
+/** Add a leading zero to `number` only if it is less then two digits in length */
+function padWithLeadingZero(number: number): string {
+  return String(number).padStart(2, "0");
 }
 
 //--------------------------------
@@ -243,10 +253,10 @@ function displayPasswords() {
     title_case_words = title_case_words + toTitleCaseFirstLetter(next_word);
     random_case_words = random_case_words + randomCaseString(next_word);
   }
-  // create two random numbers
-  const random_number_one = randomNumber();
-  const random_number_two = randomNumber();
-  // create two random numbers
+  // create two random numbers for inclusion in the final password output
+  const random_number_one = padWithLeadingZero(randomNumber());
+  const random_number_two = padWithLeadingZero(randomNumber());
+  // create two random marks for inclusion in the final password output
   const random_mark_one = randomMark();
   const random_mark_two = randomMark();
   console.log(
@@ -255,7 +265,8 @@ function displayPasswords() {
       cyan(`${random_mark_two}`) +
       green(`${random_number_two}`) + "\t\t" + title_case_words +
       cyan(`${random_mark_one}`) +
-      green(`${random_number_one}`) + green(`${random_number_two}`) + "\t\t" +
+      green(`${random_number_one}`) + green(`${random_number_two}`) +
+      "\t\t" +
       cyan(`${random_mark_one}`) + green(`${random_number_one}`) +
       random_case_words +
       cyan(`${random_mark_two}`) + green(`${random_number_two}`),
@@ -402,7 +413,7 @@ const words:Array<string> = [
 if (import.meta.main) {
   // only returns if execCliArgs() did not find options to execute
   if (Deno.args.length > 0) await execCliArgs();
-  // default execute action if no cli args given - offer a password
+  // default execute action if no cli args given - offer some passwords
   console.log("\n'qpass' suggested passwords are:\n");
   for (let i: number = 0; i < 3; i++) {
     displayPasswords();

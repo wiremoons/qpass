@@ -1,3 +1,10 @@
+## v0.3.0
+
+- Complete the function `randomCaseString` to produce mix case password words.
+- Add `padWithLeadingZero` to ensure any single digit random numbers have a
+  leading zero, to ensure final password lengths are the same.
+- Minor updates and correction to comments.
+
 ## v0.2.0
 
 - Remove two unneeded variable assignments for returned values.

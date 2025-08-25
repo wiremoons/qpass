@@ -1,3 +1,7 @@
+## v0.3.1
+
+- Switched to `"jsr:@wiremoons/version@1.x"` improved `version()` module.
+
 ## v0.3.0
 
 - Complete the function `randomCaseString` to produce mix case password words.

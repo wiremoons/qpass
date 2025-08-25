@@ -35,7 +35,7 @@ import { basename } from "jsr:@std/path@1.x/basename";
 import { bold, cyan, green, setColorEnabled } from "jsr:@std/fmt@1.x/colors";
 
 // Other imports
-import { cliVersion } from "https://deno.land/x/deno_mod@0.8.1/mod.ts";
+import { version } from "jsr:@wiremoons/version@1.x";
 
 //--------------------------------
 // GLOBAL DECLARATIONS
@@ -45,7 +45,7 @@ import { cliVersion } from "https://deno.land/x/deno_mod@0.8.1/mod.ts";
 
 /** define options for `cliVersion()` function for application version data */
 const versionOptions = {
-  version: "0.3.0",
+  version: "0.3.1",
   copyrightName: "Simon Rowe",
   licenseUrl: "https://github.com/wiremoons/qpass/",
   crYear: "2023-2025",
@@ -177,7 +177,7 @@ function padWithLeadingZero(number: number): string {
 
 /** Display application version information when requested */
 async function printVersionInfo() {
-  const versionData = await cliVersion(versionOptions);
+  const versionData = await version(versionOptions);
   console.log(versionData);
 }
 

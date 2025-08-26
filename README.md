@@ -1,3 +1,6 @@
+[![MIT licensed](https://img.shields.io/badge/license-MIT-blue.svg)](https://raw.githubusercontent.com/hyperium/hyper/master/LICENSE)
+[![](https://img.shields.io/badge/deno-v2.4.5-green.svg)](https://github.com/denoland/deno)
+
 ## About
 
 _Quick Password_ `qpass` : Provide a choice of passwords based on a random

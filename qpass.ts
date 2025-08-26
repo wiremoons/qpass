@@ -18,8 +18,8 @@
  * @code deno run --quiet --allow-read --allow-env=QPASS_WORDS qpass.ts
  * @code deno run --quiet --allow-read --allow-env=QPASS_WORDS https://raw.githubusercontent.com/wiremoons/qpass/main/qpass.ts
  * @note The program can be installed to 'DENO_INSTALL_ROOT' to using the command:
- * @code deno install -f --quiet --allow-read --allow-env=QPASS_WORDS qpass.ts
- * @code deno install -f --quiet --allow-read --allow-env=QPASS_WORDS https://raw.githubusercontent.com/wiremoons/qpass/main/qpass.ts
+ * @code deno install --global -f --quiet --allow-read --allow-env=QPASS_WORDS qpass.ts
+ * @code deno install --global -f --quiet --allow-read --allow-env=QPASS_WORDS https://raw.githubusercontent.com/wiremoons/qpass/main/qpass.ts
  * @note The program can be compiled using the command:
  * @code deno compile --quiet --allow-read --allow-env=QPASS_WORDS qpass.ts
  * @code deno compile --quiet --allow-read --allow-env=QPASS_WORDS https://raw.githubusercontent.com/wiremoons/qpass/main/qpass.ts
@@ -41,9 +41,8 @@ import { version } from "jsr:@wiremoons/version@1.x";
 // GLOBAL DECLARATIONS
 //--------------------------------
 
-// CLI VERSION OPTIONS DECLARATION
-
-/** define options for `cliVersion()` function for application version data */
+// VERSION OPTIONS : "jsr:@wiremoons/version"
+/** define options for `version()` to provide this applications version data */
 const versionOptions = {
   version: "0.3.1",
   copyrightName: "Simon Rowe",
@@ -65,7 +64,7 @@ const cliOpts = {
 
 /** obtain any command line arguments and exec them as needed */
 async function execCliArgs() {
-  //console.log(parse(Deno.args,cliOpts));
+  // console.debug(parse(Deno.args, cliOpts));
   const cliArgs = parseArgs(Deno.args, cliOpts);
 
   if (cliArgs.help) {

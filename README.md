@@ -32,12 +32,26 @@ Instructions to achieve this as are available from the web page here:
 Installation of _Deno_ is easy as it is just a single binary executable file -
 just download a copy and add it to a directory in your path.
 
-Once _Deno_ itself is installed, two easy options to install `qpass` are:
+Once _Deno_ itself is installed, one of the following options can be used
+install `qpass`:
+
+**Recommended:** Build from a local cloned copy of this `qpass` GitHub repo:
+
+```console
+git clone https://github.com/wiremoons/qpass.git
+cd qpass
+deno compile --quiet --allow-read --allow-env=QPASS_WORDS ./qpass.ts
+```
+
+The resulting executable called `qpass` can now be used to run the program.
+
+**Other Options**: The following two options skip the `git clone` step above,
+and instead will run as remote executables.
 
 The `qpass` program can be installed as a script using the command:
 
 ```console
-deno install -f --quiet --allow-read --allow-env=QPASS_WORDS https://raw.githubusercontent.com/wiremoons/qpass/main/qpass.ts
+deno install --global -f --quiet --allow-read --allow-env=QPASS_WORDS https://raw.githubusercontent.com/wiremoons/qpass/main/qpass.ts
 ```
 
 Alternatively a copy of `qpass` can be compiled together with the _Deno_ binary
@@ -57,6 +71,7 @@ found with the command line flags:
 - `-h` : show the command line flag help.
 - `-m` : disable colour output.
 - `-a` : shows the additional help information.
+- `-v` : show the programs version information.
 
 ## Updates and Changes
 
